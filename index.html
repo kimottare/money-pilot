@@ -110,7 +110,7 @@
                     }, { merge: true });
                 } catch (error) {
                     console.error("Error saving data: ", error);
-                    alert("データの保存に失敗しました。");
+                    alert("クラウドへの保存に失敗しました。");
                 }
             };
 
@@ -120,23 +120,42 @@
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     const text = e.target.result;
-                    const lines = text.trim().split('\n');
+                    // スマホ特有の様々な改行コードに対応
+                    const lines = text.trim().split(/\r\n|\n|\r/);
                     const parsedData = [];
+                    
+                    // 1行目（ヘッダー）はスキップして2行目から読み込む
                     for (let i = 1; i < lines.length; i++) {
-                        const values = lines[i].split(',');
+                        const line = lines[i].trim();
+                        if (!line) continue; // 空行はスキップ
+                        
+                        const values = line.split(',');
                         if (values.length >= 4) {
-                            parsedData.push({
-                                amount: Math.abs(parseInt(values[0], 10)),
-                                date: values[1],
-                                memo: values[2],
-                                category: values[3].trim()
-                            });
+                            // ダブルクォーテーション " が入っていたら除去する
+                            const cleanAmountStr = values[0].replace(/"/g, '').trim();
+                            const amount = parseInt(cleanAmountStr, 10);
+                            
+                            if (!isNaN(amount)) {
+                                parsedData.push({
+                                    amount: Math.abs(amount),
+                                    date: values[1].replace(/"/g, '').trim(),
+                                    memo: values[2].replace(/"/g, '').trim(),
+                                    category: values[3].replace(/"/g, '').trim()
+                                });
+                            }
                         }
                     }
+                    
                     if (parsedData.length > 0) {
                         parsedData.sort((a, b) => new Date(b.date) - new Date(a.date));
                         await saveData(parsedData, categoryMapping);
+                        alert(`${parsedData.length}件のデータを読み込みました！`);
+                    } else {
+                        alert("データを読み込めませんでした。CSVの形式が正しいか（1行目に金額・日付などの見出しがあるか）確認してください。");
                     }
+                    
+                    // 同じファイルを連続で選べるようにリセット
+                    event.target.value = '';
                 };
                 reader.readAsText(file);
             };
