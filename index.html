@@ -4,6 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money Pilot - Cloud Edition</title>
+    
+    <!-- ★追加: iOS ホーム画面用（PWA）設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Money Pilot">
+
+    <!-- ★追加: アイコン動的生成スクリプト（モダンな紙飛行機デザイン） -->
+    <script>
+        (function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // 背景：ダークスレートのグラデーション（クールな夜空）
+            const grad = ctx.createLinearGradient(0, 0, 512, 512);
+            grad.addColorStop(0, '#1e293b'); // slate-800
+            grad.addColorStop(1, '#0f172a'); // slate-900
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // モチーフ：上昇する紙飛行機（ナビゲートの象徴）
+            // 左翼（明るいスカイブルー）
+            ctx.fillStyle = '#38bdf8'; 
+            ctx.beginPath();
+            ctx.moveTo(400, 112); // 先端
+            ctx.lineTo(112, 224); // 左端
+            ctx.lineTo(256, 288); // 中央
+            ctx.closePath();
+            ctx.fill();
+
+            // 右翼（少し暗めのブルーで立体感を演出）
+            ctx.fillStyle = '#0284c7'; 
+            ctx.beginPath();
+            ctx.moveTo(400, 112); // 先端
+            ctx.lineTo(256, 288); // 中央
+            ctx.lineTo(352, 400); // 右端
+            ctx.closePath();
+            ctx.fill();
+
+            // 尾翼（中間のブルー）
+            ctx.fillStyle = '#0ea5e9'; 
+            ctx.beginPath();
+            ctx.moveTo(256, 288); // 中央
+            ctx.lineTo(224, 384); // 下端
+            ctx.lineTo(288, 336); // 右折れ目
+            ctx.closePath();
+            ctx.fill();
+
+            const iconUrl = canvas.toDataURL('image/png');
+            
+            // iOS用アイコンとして登録
+            const appleLink = document.createElement('link');
+            appleLink.rel = 'apple-touch-icon';
+            appleLink.href = iconUrl;
+            document.head.appendChild(appleLink);
+            
+            // ついでにPCブラウザのタブ用アイコン（ファビコン）にも登録
+            const favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.href = iconUrl;
+            document.head.appendChild(favicon);
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
